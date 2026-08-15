@@ -17,10 +17,14 @@ function createRawEmail(params: {
     ...(params.bcc && params.bcc.length ? [`Bcc: ${params.bcc.join(", ")}`] : []),
     `Subject: =?utf-8?B?${Buffer.from(params.subject).toString("base64")}?=`,
     "MIME-Version: 1.0",
-    `Content-Type: ${params.bodyType === "html" ? "text/html" : "text/plain"}; charset="UTF-8"`,
+    `Content-Type: text/html; charset="UTF-8"`,
   ];
 
-  const emailContent = `${headers.join("\r\n")}\r\n\r\n${params.body}`;
+  const formattedBody = params.bodyType === "html" 
+    ? params.body 
+    : params.body.replace(/\r?\n/g, "<br>");
+
+  const emailContent = `${headers.join("\r\n")}\r\n\r\n${formattedBody}`;
   return Buffer.from(emailContent)
     .toString("base64")
     .replace(/\+/g, "-")
