@@ -10,7 +10,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { schemas } from "./tools/schemas.js";
 import { handleGmailSendEmail, handleGmailCreateDraft } from "./tools/gmailTools.js";
-import { handleGdocsAppendContent } from "./tools/docsTools.js";
+import { handleGdocsAppendContent, handleGdocsClearContent } from "./tools/docsTools.js";
 import { logInfo, logError } from "./utils/logger.js";
 import { withTimeout } from "./utils/timeout.js";
 
@@ -58,6 +58,11 @@ class GoogleWorkspaceMcpServer {
           description: "Append content to a Google Document",
           inputSchema: schemas.gdocsAppendContent,
         },
+        {
+          name: "gdocs_clear_content",
+          description: "Clear all content from a Google Document",
+          inputSchema: schemas.gdocsClearContent,
+        },
       ],
     }));
 
@@ -96,6 +101,8 @@ class GoogleWorkspaceMcpServer {
         return await handleGmailCreateDraft(args);
       case "gdocs_append_content":
         return await handleGdocsAppendContent(args);
+      case "gdocs_clear_content":
+        return await handleGdocsClearContent(args);
       default:
         throw new McpError(
           ErrorCode.MethodNotFound,

@@ -92,3 +92,58 @@ export async function appendContent(params: GDocsAppendParams) {
     throw handleDocsError(err);
   }
 }
+
+export type GDocsClearParams = {
+  document_id: string;
+};
+
+export async function clearContent(params: GDocsClearParams) {
+  const auth = getAuthClient();
+  const docs = google.docs({ version: "v1", auth });
+
+  try {
+    const doc = await withRetry(() => 
+      docs.documents.get({ documentId: params.document_id })
+    );
+
+    const bodyContent = doc.data.body?.content;
+    if (!bodyContent || bodyContent.length === 0) {
+      throw new Error("Document body is empty or invalid structure.");
+    }
+
+    const lastElement = bodyContent[bodyContent.length - 1];
+    const endIndex = (lastElement.endIndex || 2) - 1;
+
+    if (endIndex <= 1) {
+      return {
+        documentId: params.document_id,
+        status: "Success (already empty)",
+      };
+    }
+
+    const updateResponse = await withRetry(() =>
+      docs.documents.batchUpdate({
+        documentId: params.document_id,
+        requestBody: {
+          requests: [
+            {
+              deleteContentRange: {
+                range: {
+                  startIndex: 1,
+                  endIndex: endIndex,
+                },
+              },
+            },
+          ],
+        },
+      })
+    );
+
+    return {
+      documentId: updateResponse.data?.documentId || params.document_id,
+      status: "Success",
+    };
+  } catch (err: any) {
+    throw handleDocsError(err);
+  }
+}

@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run verify",
+    "verify": "tsx tests/verify.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "auth": "tsx src/google/getToken.ts"

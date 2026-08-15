@@ -18,9 +18,30 @@ export const GdocsAppendContentSchema = z.object({
   add_newline_before: z.boolean().default(true),
 });
 
+export const GdocsClearContentSchema = z.object({
+  document_id: z.string().min(1, "Document ID is required"),
+});
+
 // JSON Schema representations for list_tools
 export const schemas = {
-  gmailSendEmail: zodToJsonSchema(GmailSendEmailSchema as any),
-  gmailCreateDraft: zodToJsonSchema(GmailCreateDraftSchema as any),
-  gdocsAppendContent: zodToJsonSchema(GdocsAppendContentSchema as any),
+  gmailSendEmail: {
+    type: "object",
+    properties: (zodToJsonSchema(GmailSendEmailSchema as any) as any).properties,
+    required: (zodToJsonSchema(GmailSendEmailSchema as any) as any).required,
+  },
+  gmailCreateDraft: {
+    type: "object",
+    properties: (zodToJsonSchema(GmailCreateDraftSchema as any) as any).properties,
+    required: (zodToJsonSchema(GmailCreateDraftSchema as any) as any).required,
+  },
+  gdocsAppendContent: {
+    type: "object",
+    properties: (zodToJsonSchema(GdocsAppendContentSchema as any) as any).properties,
+    required: (zodToJsonSchema(GdocsAppendContentSchema as any) as any).required,
+  },
+  gdocsClearContent: {
+    type: "object",
+    properties: (zodToJsonSchema(GdocsClearContentSchema as any) as any).properties,
+    required: (zodToJsonSchema(GdocsClearContentSchema as any) as any).required,
+  },
 };
